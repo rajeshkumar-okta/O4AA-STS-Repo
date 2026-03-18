@@ -27,6 +27,7 @@ from dotenv import load_dotenv
 from auth.agent_config import get_agent_config, is_configured
 from orchestrator.orchestrator import Orchestrator
 from api.conversation_store import conversation_store
+from api.debug import router as debug_router
 
 # Load environment variables
 load_dotenv()
@@ -50,6 +51,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include debug router (REMOVE IN PRODUCTION!)
+app.include_router(debug_router)
 
 
 # --- Request/Response Models ---

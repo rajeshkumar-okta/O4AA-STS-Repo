@@ -151,9 +151,9 @@ export default function Home() {
       await fetch(`${apiUrl}/api/revoke`, { method: 'POST' });
 
       // Clear local state
-      setConversations([]);
-      setTokenExchanges([]);
-      setAgentFlow([]);
+      setChatMessages([]);
+      setCurrentTokenExchanges([]);
+      setCurrentAgentFlow([]);
 
       // Trigger a GitHub request to force consent flow
       handleSendMessage('Show my GitHub repositories');

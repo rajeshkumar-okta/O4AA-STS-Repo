@@ -12,7 +12,7 @@ export default function TokenExchangeCard({ exchanges }: Props) {
   const denied = exchanges.filter(e => e.status === 'denied' || (e.access_denied && e.status !== 'interaction_required' && e.status !== 'consent_required'));
 
   return (
-    <div className="bg-white rounded-xl border-2 border-neutral-border shadow-sm overflow-hidden">
+    <div className="rounded-xl border-2 shadow-sm overflow-hidden" style={{ backgroundColor: '#e0f2f1', borderColor: '#26a69a' }}>
       <div className="bg-gradient-to-r from-okta-blue to-okta-blue-light px-4 py-3 border-b border-neutral-border">
         <h3 className="text-white font-semibold flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

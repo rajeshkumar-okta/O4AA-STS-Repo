@@ -8,6 +8,10 @@ interface Props {
 }
 
 export default function AgentFlowCard({ steps, isLoading }: Props) {
+  // Detect if this is Jira or GitHub based on steps
+  const isJira = steps.some(s => s.step === 'execute_jira');
+  const executeStep = isJira ? 'execute_jira' : 'execute_github';
+
   // Define workflow stages with progressive colors (using inline styles for reliability)
   const workflowStages = [
     {
@@ -27,12 +31,12 @@ export default function AgentFlowCard({ steps, isLoading }: Props) {
       textColor: '#d97706'
     },
     {
-      id: 'execute_github',
-      label: 'GitHub',
-      icon: 'GH',
-      bgColor: '#4ade80',           // Light Green
-      inactiveBg: 'rgba(74, 222, 128, 0.2)',
-      textColor: '#16a34a'
+      id: executeStep,
+      label: isJira ? 'Jira' : 'GitHub',
+      icon: isJira ? 'JR' : 'GH',
+      bgColor: isJira ? '#2196f3' : '#4ade80',
+      inactiveBg: isJira ? 'rgba(33, 150, 243, 0.2)' : 'rgba(74, 222, 128, 0.2)',
+      textColor: isJira ? '#1565c0' : '#16a34a'
     },
     {
       id: 'generate_response',

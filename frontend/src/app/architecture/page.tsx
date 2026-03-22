@@ -179,15 +179,15 @@ export default function ArchitecturePage() {
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="font-semibold text-gray-800 text-sm mb-2">🔀 Pull Requests</div>
-                <div className="text-xs text-gray-600 font-mono">GET /repos/{owner}/{repo}/pulls</div>
+                <div className="text-xs text-gray-600 font-mono">{"GET /repos/{owner}/{repo}/pulls"}</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="font-semibold text-gray-800 text-sm mb-2">🐛 Issues</div>
-                <div className="text-xs text-gray-600 font-mono">GET /repos/{owner}/{repo}/issues</div>
+                <div className="text-xs text-gray-600 font-mono">{"GET /repos/{owner}/{repo}/issues"}</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="font-semibold text-gray-800 text-sm mb-2">💬 Comments</div>
-                <div className="text-xs text-gray-600 font-mono">POST /repos/.../issues/{n}/comments</div>
+                <div className="text-xs text-gray-600 font-mono">{"POST /repos/.../issues/{n}/comments"}</div>
               </div>
             </div>
 

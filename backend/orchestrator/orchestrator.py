@@ -277,7 +277,25 @@ Examples:
 
         state["sts_result"] = result
         state["interaction_required"] = result.get("interaction_required", False)
-        state["interaction_uri"] = result.get("interaction_uri")
+        interaction_uri = result.get("interaction_uri")
+
+        # For Jira, append scopes to the interaction_uri if needed
+        if interaction_uri and service == "jira" and requested_scopes:
+            from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
+            parsed = urlparse(interaction_uri)
+            params = parse_qs(parsed.query)
+
+            # Add scope parameter if not present
+            if 'scope' not in params:
+                params['scope'] = [' '.join(requested_scopes)]
+                new_query = urlencode(params, doseq=True)
+                interaction_uri = urlunparse((
+                    parsed.scheme, parsed.netloc, parsed.path,
+                    parsed.params, new_query, parsed.fragment
+                ))
+                logger.info(f"[STS Exchange] Added scopes to Jira interaction_uri: {requested_scopes}")
+
+        state["interaction_uri"] = interaction_uri
 
         if result["success"]:
             state["service_token"] = result["access_token"]

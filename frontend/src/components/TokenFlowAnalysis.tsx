@@ -88,7 +88,7 @@ export default function TokenFlowAnalysis({ exchanges, isLoading }: TokenFlowAna
               {/* Step 3 */}
               <div className="flex items-center space-x-2">
                 <div className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${
-                  latestExchange?.status === 'success'
+                  latestExchange?.status === 'granted'
                     ? 'bg-green-400 text-green-900'
                     : latestExchange?.status === 'interaction_required'
                     ? 'bg-yellow-400 text-yellow-900'
@@ -96,7 +96,7 @@ export default function TokenFlowAnalysis({ exchanges, isLoading }: TokenFlowAna
                     ? 'bg-blue-400 text-blue-900 animate-pulse'
                     : 'bg-white/30 text-white'
                 }`}>
-                  {latestExchange?.status === 'success' ? (
+                  {latestExchange?.status === 'granted' ? (
                     <CheckCircle className="w-3 h-3" />
                   ) : latestExchange?.status === 'interaction_required' ? (
                     <AlertCircle className="w-3 h-3" />
@@ -107,7 +107,7 @@ export default function TokenFlowAnalysis({ exchanges, isLoading }: TokenFlowAna
                   )}
                 </div>
                 <span className="text-sm text-white/90">
-                  GitHub Access Token {latestExchange?.status === 'success' ? '✓' : latestExchange?.status === 'interaction_required' ? '(Consent Required)' : ''}
+                  GitHub Access Token {latestExchange?.status === 'granted' ? '✓' : latestExchange?.status === 'interaction_required' ? '(Consent Required)' : ''}
                 </span>
               </div>
             </div>
@@ -146,7 +146,7 @@ export default function TokenFlowAnalysis({ exchanges, isLoading }: TokenFlowAna
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className={`w-2 h-2 rounded-full ${
-                  latestExchange?.status === 'success'
+                  latestExchange?.status === 'granted'
                     ? 'bg-green-400 animate-pulse'
                     : latestExchange?.status === 'interaction_required'
                     ? 'bg-yellow-400 animate-pulse'
@@ -155,7 +155,7 @@ export default function TokenFlowAnalysis({ exchanges, isLoading }: TokenFlowAna
                     : 'bg-white/40'
                 }`}></div>
                 <span className="text-xs text-white/80">
-                  {latestExchange?.status === 'success'
+                  {latestExchange?.status === 'granted'
                     ? 'Token Active'
                     : latestExchange?.status === 'interaction_required'
                     ? 'Consent Required'

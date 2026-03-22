@@ -234,11 +234,14 @@ Examples:
             service_name = "Jira"
             agent_name = "Jira MCP"
             color = "#0052CC"  # Jira blue
+            # Jira requires explicit scopes in the OAuth-STS request
+            requested_scopes = ["read:jira-work", "write:jira-work", "read:jira-user"]
         else:
             resource_indicator = self.config.github_resource_indicator
             service_name = "GitHub"
             agent_name = "GitHub MCP"
             color = "#6366f1"
+            requested_scopes = []  # GitHub doesn't require explicit scopes
 
         # Check if resource indicator is configured
         if not resource_indicator:
@@ -268,8 +271,8 @@ Examples:
             state["agent_flow"][-1]["action"] = f"{service_name} not configured"
             return state
 
-        # Create STS exchange with the appropriate resource indicator
-        sts = OktaSTSExchange(resource_indicator=resource_indicator)
+        # Create STS exchange with the appropriate resource indicator and scopes
+        sts = OktaSTSExchange(resource_indicator=resource_indicator, scopes=requested_scopes)
         result = await sts.exchange_token(state["user_token"])
 
         state["sts_result"] = result
@@ -287,7 +290,7 @@ Examples:
                 "access_denied": False,
                 "status": "granted",
                 "scopes": result.get("scopes", []),  # Real scopes from JWT
-                "requested_scopes": [],
+                "requested_scopes": requested_scopes,  # What we asked for
                 "demo_mode": result.get("demo_mode", False),
             })
 
@@ -305,7 +308,7 @@ Examples:
                 "access_denied": False,
                 "status": "interaction_required",
                 "scopes": [],
-                "requested_scopes": [],
+                "requested_scopes": requested_scopes,  # Show what we're requesting
                 "error": "User authorization required",
                 "interaction_uri": result.get("interaction_uri"),
                 "demo_mode": False,

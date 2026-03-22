@@ -99,18 +99,20 @@ class OktaSTSExchange:
     Handles the interaction_required flow for first-time consent.
     """
 
-    def __init__(self, resource_indicator: Optional[str] = None):
+    def __init__(self, resource_indicator: Optional[str] = None, scopes: Optional[List[str]] = None):
         """
         Initialize the STS exchange handler.
 
         Args:
             resource_indicator: Optional resource indicator. If not provided,
                                uses the default GitHub resource indicator from config.
+            scopes: Optional list of scopes to request (required for Jira)
         """
         self._config = get_agent_config()
         self._jwt_builder = JWTBuilderFactory.get_builder()
         # Allow override of resource indicator for different services (GitHub, Jira, etc.)
         self._resource_indicator = resource_indicator or self._config.resource_indicator
+        self._scopes = scopes or []
 
     def is_configured(self) -> bool:
         """Check if STS exchange is properly configured."""
@@ -128,7 +130,7 @@ class OktaSTSExchange:
             audience=self._config.token_endpoint
         )
 
-        return {
+        payload = {
             "grant_type": GRANT_TYPE_TOKEN_EXCHANGE,
             "requested_token_type": REQUESTED_TOKEN_TYPE_STS,
             "subject_token": user_id_token,
@@ -137,6 +139,13 @@ class OktaSTSExchange:
             "client_assertion": client_assertion,
             "resource": self._resource_indicator,
         }
+
+        # Add scope parameter if scopes are specified (required for Jira)
+        if self._scopes:
+            payload["scope"] = " ".join(self._scopes)
+            logger.info(f"[OAuth-STS] Requesting scopes: {payload['scope']}")
+
+        return payload
 
     async def exchange_token(
         self,

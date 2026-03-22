@@ -22,7 +22,7 @@ export default function TokenFlowAnalysis({ exchanges, isLoading }: TokenFlowAna
     // In a real scenario, you'd decode the JWT
     // For demo, we show representative claims
     return {
-      sub: latestExchange.user_id || 'user@example.com',
+      sub: latestExchange.agent_name || 'user@example.com',
       aud: 'github-api',
       scope: latestExchange.scopes?.join(', ') || 'repo, read:org',
       iat: new Date().toISOString(),

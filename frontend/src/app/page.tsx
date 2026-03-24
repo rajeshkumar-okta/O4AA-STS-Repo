@@ -847,7 +847,7 @@ export default function Home() {
 
           {/* Architecture Link */}
           <Link
-            href="/architecture"
+            href={`/architecture?service=${activeService}`}
             className="block p-4 bg-gradient-to-r from-okta-blue to-okta-blue-light text-white rounded-xl hover:shadow-lg transition hover:scale-[1.02]"
           >
             <div className="flex items-center justify-between">

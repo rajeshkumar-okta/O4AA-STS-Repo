@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
 import { Key, Lock, Shield, Activity, GitBranch, ChevronDown, ChevronRight, User, FileText, Server, ArrowRight, RefreshCw, Ticket } from 'lucide-react';
 import CollapsibleSection from '@/components/CollapsibleSection';
 
@@ -71,12 +72,22 @@ function JWTDisplay({ title, header, payload, description, color }: JWTDisplayPr
 
 export default function ArchitecturePage() {
   const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [activeService, setActiveService] = useState<'github' | 'jira'>('github');
   const now = Math.floor(Date.now() / 1000);
 
-  // Load active service from sessionStorage (syncs with main page)
+  // Load active service from URL query param (priority) or sessionStorage (fallback)
   useEffect(() => {
     try {
+      // First, check URL query parameter (highest priority)
+      const serviceParam = searchParams.get('service');
+      if (serviceParam === 'github' || serviceParam === 'jira') {
+        setActiveService(serviceParam);
+        sessionStorage.setItem(ACTIVE_SERVICE_STORAGE_KEY, serviceParam);
+        return;
+      }
+
+      // Fallback to sessionStorage
       const savedActiveService = sessionStorage.getItem(ACTIVE_SERVICE_STORAGE_KEY);
       if (savedActiveService === 'github' || savedActiveService === 'jira') {
         setActiveService(savedActiveService);
@@ -84,7 +95,7 @@ export default function ArchitecturePage() {
     } catch (e) {
       console.error('Error loading active service:', e);
     }
-  }, []);
+  }, [searchParams]);
 
   // Save active service when changed on this page
   useEffect(() => {

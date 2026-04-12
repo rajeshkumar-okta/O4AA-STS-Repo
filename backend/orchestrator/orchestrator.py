@@ -92,13 +92,14 @@ class Orchestrator:
             logger.error("ANTHROPIC_API_KEY not set in environment!")
             raise ValueError("ANTHROPIC_API_KEY environment variable is required")
 
+        llm_model = os.getenv("LLM_MODEL_NAME", "claude-sonnet-4-6")
         self.llm = ChatAnthropic(
-            model="claude-sonnet-4-6",
+            model=llm_model,
             temperature=0,
             anthropic_api_key=anthropic_api_key,
             anthropic_api_url="https://api.anthropic.com"
         )
-        logger.info("[LLM Config] ChatAnthropic initialized successfully")
+        logger.info(f"[LLM Config] ChatAnthropic initialized with model: {llm_model}")
 
         # Build the workflow graph
         self.graph = self._build_graph()

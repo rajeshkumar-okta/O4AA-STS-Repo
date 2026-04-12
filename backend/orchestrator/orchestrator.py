@@ -22,6 +22,7 @@ import json
 from typing import Dict, Any, List, Optional, TypedDict, Literal
 from langgraph.graph import StateGraph, END
 from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from auth.okta_sts import get_sts_exchange, OktaSTSExchange
@@ -87,16 +88,41 @@ class Orchestrator:
         self.config = get_agent_config()
 
         # LLM for routing and response generation
-        anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not anthropic_api_key:
-            logger.error("ANTHROPIC_API_KEY not set in environment!")
-            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+        # --- Original Anthropic configuration (commented out) ---
+        # anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+        # if not anthropic_api_key:
+        #     logger.error("ANTHROPIC_API_KEY not set in environment!")
+        #     raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+        #
+        # self.llm = ChatAnthropic(
+        #     model="claude-sonnet-4-6",
+        #     temperature=0,
+        #     anthropic_api_key=anthropic_api_key,
+        #     anthropic_api_url="https://api.anthropic.com"
+        # )
+        # --- End of original Anthropic configuration ---
 
-        self.llm = ChatAnthropic(
+        # OpenAI Gateway configuration - read from environment variables
+        openai_api_key = os.getenv("OPENAI_API_KEY")
+        openai_base_url = os.getenv("OPENAI_API_BASE_URL")
+        openai_gateway_secret = os.getenv("OPENAI_GATEWAY_SECRET", "")
+
+        if not openai_api_key:
+            logger.error("OPENAI_API_KEY not set in environment!")
+            raise ValueError("OPENAI_API_KEY environment variable is required")
+
+        if not openai_base_url:
+            logger.error("OPENAI_API_BASE_URL not set in environment!")
+            raise ValueError("OPENAI_API_BASE_URL environment variable is required")
+
+        self.llm = ChatOpenAI(
             model="claude-sonnet-4-6",
-            temperature=0,
-            anthropic_api_key=anthropic_api_key,
-            anthropic_api_url="https://api.anthropic.com"
+            api_key=openai_api_key,
+            base_url=openai_base_url,
+            # Custom headers are passed here
+            default_headers={
+                "x-gateway-secret": openai_gateway_secret
+            }
         )
 
         # Build the workflow graph

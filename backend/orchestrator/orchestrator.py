@@ -115,6 +115,11 @@ class Orchestrator:
             logger.error("OPENAI_API_BASE_URL not set in environment!")
             raise ValueError("OPENAI_API_BASE_URL environment variable is required")
 
+        # Log configuration (mask sensitive values)
+        logger.info(f"[LLM Config] Base URL: {openai_base_url}")
+        logger.info(f"[LLM Config] API Key: {openai_api_key[:8]}...{openai_api_key[-4:] if len(openai_api_key) > 12 else '****'}")
+        logger.info(f"[LLM Config] Gateway Secret: {'configured' if openai_gateway_secret else 'not set'}")
+
         self.llm = ChatOpenAI(
             model="claude-sonnet-4-6",
             api_key=openai_api_key,
@@ -124,6 +129,7 @@ class Orchestrator:
                 "x-gateway-secret": openai_gateway_secret
             }
         )
+        logger.info("[LLM Config] ChatOpenAI initialized successfully")
 
         # Build the workflow graph
         self.graph = self._build_graph()
@@ -214,12 +220,22 @@ Examples:
 - "What can you do?" → {"service": "github", "intent": "help", "parameters": {}}
 """
 
-        response = await self.llm.ainvoke([
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=state["user_message"])
-        ])
-
         try:
+            response = await self.llm.ainvoke([
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=state["user_message"])
+            ])
+
+            # Handle None or empty response
+            if response is None or response.content is None:
+                logger.error("[Router] LLM returned None response")
+                state["service"] = "github"
+                state["intent"] = "help"
+                state["parameters"] = {}
+                state["agent_flow"][-1]["status"] = "error"
+                state["agent_flow"][-1]["action"] = "LLM response error"
+                return state
+
             content = response.content.strip()
             if content.startswith("```"):
                 lines = content.split("\n")
@@ -232,8 +248,13 @@ Examples:
             state["parameters"] = result.get("parameters", {})
             logger.info(f"[Router] Service: {state['service']}, Intent: {state['intent']}")
         except json.JSONDecodeError as e:
-            logger.warning(f"Failed to parse router response: {response.content}")
+            logger.warning(f"Failed to parse router response: {response.content if response else 'None'}")
             logger.error(f"JSON parse error: {e}")
+            state["service"] = "github"
+            state["intent"] = "help"
+            state["parameters"] = {}
+        except Exception as e:
+            logger.error(f"[Router] LLM invocation error: {e}")
             state["service"] = "github"
             state["intent"] = "help"
             state["parameters"] = {}
@@ -688,12 +709,22 @@ Result: {json.dumps(operation_result.get('data', {}), indent=2)}
 Summary: {operation_result.get('summary', '')}
 """
 
-        response = await self.llm.ainvoke([
-            SystemMessage(content=system_prompt),
-            HumanMessage(content=f"Generate a response for this {service_name} operation:\n{context}")
-        ])
+        try:
+            response = await self.llm.ainvoke([
+                SystemMessage(content=system_prompt),
+                HumanMessage(content=f"Generate a response for this {service_name} operation:\n{context}")
+            ])
 
-        state["final_response"] = response.content
+            # Handle None or empty response
+            if response is None or response.content is None:
+                logger.error("[Response] LLM returned None response")
+                state["final_response"] = f"Operation completed. Result: {operation_result.get('summary', 'Success')}"
+            else:
+                state["final_response"] = response.content
+        except Exception as e:
+            logger.error(f"[Response] LLM invocation error: {e}")
+            state["final_response"] = f"Operation completed. Result: {operation_result.get('summary', 'Success')}"
+
         state["agent_flow"][-1]["status"] = "completed"
 
         return state

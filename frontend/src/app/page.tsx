@@ -50,18 +50,23 @@ export default function Home() {
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const [activeService, setActiveService] = useState<'github' | 'jira'>('github');
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [rightPanelWidth, setRightPanelWidth] = useState(480); // Increased default width
+  const [rightPanelWidth, setRightPanelWidth] = useState(960); // Detail pane defaults to ~60% of a typical 1600px viewport
   const [isResizing, setIsResizing] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const resizeRef = useRef<HTMLDivElement>(null);
+
+  // Initialize detail pane to 60% of viewport on mount; keep chat at ~40%
+  useEffect(() => {
+    setRightPanelWidth(Math.round(window.innerWidth * 0.6));
+  }, []);
 
   // Handle panel resize
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isResizing) return;
       const newWidth = window.innerWidth - e.clientX;
-      // Constrain between 350px and 700px
-      setRightPanelWidth(Math.min(700, Math.max(350, newWidth)));
+      // Chat floor 400px; detail ceiling 75% of viewport
+      setRightPanelWidth(Math.min(window.innerWidth * 0.75, Math.max(400, newWidth)));
     };
 
     const handleMouseUp = () => {

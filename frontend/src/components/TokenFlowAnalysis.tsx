@@ -2,7 +2,23 @@
 
 import { useState } from 'react';
 import { TokenExchange, TokenInfo, DecodedToken } from '@/types';
-import { ChevronDown, ChevronRight, Key, Shield, Clock, CheckCircle, AlertCircle, Lock, FileText, User, Server } from 'lucide-react';
+import { ChevronDown, ChevronRight, Key, Shield, Clock, CheckCircle, AlertCircle, Lock, FileText, User, Server, Copy, Check } from 'lucide-react';
+
+function ColoredJwt({ token }: { token: string }) {
+  const parts = token.split('.');
+  if (parts.length !== 3) {
+    return <span className="text-orange-300">{token}</span>;
+  }
+  return (
+    <>
+      <span className="text-red-300">{parts[0]}</span>
+      <span className="text-white/40">.</span>
+      <span className="text-purple-300">{parts[1]}</span>
+      <span className="text-white/40">.</span>
+      <span className="text-cyan-300">{parts[2]}</span>
+    </>
+  );
+}
 
 interface TokenFlowAnalysisProps {
   exchanges: TokenExchange[];
@@ -21,7 +37,20 @@ interface TokenDisplayProps {
 
 function TokenDisplay({ title, icon, tokenInfo, color, stepNumber, isCompleted }: TokenDisplayProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [copied, setCopied] = useState(false);
   const decoded = tokenInfo?.decoded;
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!decoded?.raw_token) return;
+    try {
+      await navigator.clipboard.writeText(decoded.raw_token);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard blocked; no-op
+    }
+  };
 
   const formatTimestamp = (ts?: number) => {
     if (!ts) return 'N/A';
@@ -66,66 +95,79 @@ function TokenDisplay({ title, icon, tokenInfo, color, stepNumber, isCompleted }
       </button>
 
       {isExpanded && decoded && (
-        <div className="px-3 pb-3 space-y-2 animate-fadeIn">
-          {/* Header */}
-          {decoded.header && (
-            <div className="bg-black/30 rounded p-2">
-              <div className="text-[10px] font-semibold text-cyan-300 uppercase mb-1">Header</div>
-              <div className="font-mono text-[10px] space-y-0.5">
-                {decoded.header.alg && (
-                  <div className="flex">
-                    <span className="text-purple-300 w-10">alg:</span>
-                    <span className="text-white/90">{decoded.header.alg}</span>
-                  </div>
+        <div className="px-3 pb-3 animate-fadeIn">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
+            {/* ENCODED (raw JWT) */}
+            <div className="bg-black/30 rounded p-2 flex flex-col">
+              <div className="flex items-center justify-between mb-1">
+                <div className="text-[10px] font-semibold text-cyan-300 uppercase">Encoded</div>
+                {decoded.raw_token && (
+                  <button
+                    onClick={handleCopy}
+                    className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] text-white/70 hover:text-white hover:bg-white/10 transition"
+                    title="Copy raw token"
+                  >
+                    {copied ? <Check className="w-3 h-3 text-green-300" /> : <Copy className="w-3 h-3" />}
+                    <span>{copied ? 'Copied' : 'Copy'}</span>
+                  </button>
                 )}
-                {decoded.header.kid && (
-                  <div className="flex">
-                    <span className="text-purple-300 w-10">kid:</span>
-                    <span className="text-white/90 truncate">{decoded.header.kid}</span>
-                  </div>
-                )}
-                {decoded.header.typ && (
-                  <div className="flex">
-                    <span className="text-purple-300 w-10">typ:</span>
-                    <span className="text-white/90">{decoded.header.typ}</span>
-                  </div>
+              </div>
+              <div className="font-mono text-[10px] break-all max-h-48 overflow-y-auto leading-snug">
+                {decoded.raw_token ? (
+                  <ColoredJwt token={decoded.raw_token} />
+                ) : (
+                  <span className="text-white/50">Raw token not available</span>
                 )}
               </div>
             </div>
-          )}
 
-          {/* Payload */}
-          {decoded.payload && (
-            <div className="bg-black/30 rounded p-2">
-              <div className="text-[10px] font-semibold text-cyan-300 uppercase mb-1">Payload</div>
-              <div className="font-mono text-[10px] space-y-0.5 max-h-40 overflow-y-auto">
-                {Object.entries(decoded.payload).map(([key, value]) => (
-                  <div key={key} className="flex">
-                    <span className="text-yellow-300 w-12 flex-shrink-0">{key}:</span>
-                    <span className="text-white/90 truncate">
-                      {key === 'iat' || key === 'exp'
-                        ? formatTimestamp(value as number)
-                        : formatValue(value)}
-                    </span>
+            {/* DECODED */}
+            <div className="space-y-2">
+              {decoded.header && (
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-[10px] font-semibold text-cyan-300 uppercase mb-1">Header</div>
+                  <div className="font-mono text-[10px] space-y-0.5">
+                    {Object.entries(decoded.header).map(([key, value]) => (
+                      <div key={key} className="flex">
+                        <span className="text-red-300 w-12 flex-shrink-0">{key}:</span>
+                        <span className="text-white/90 truncate">{formatValue(value)}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
+                </div>
+              )}
 
-          {/* Signature Preview */}
-          {decoded.signature_preview && (
-            <div className="bg-black/30 rounded p-2">
-              <div className="text-[10px] font-semibold text-cyan-300 uppercase mb-1">Signature</div>
-              <div className="font-mono text-[10px] text-white/60 truncate">
-                {decoded.signature_preview}
-              </div>
-            </div>
-          )}
+              {decoded.payload && (
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-[10px] font-semibold text-cyan-300 uppercase mb-1">Payload</div>
+                  <div className="font-mono text-[10px] space-y-0.5 max-h-40 overflow-y-auto">
+                    {Object.entries(decoded.payload).map(([key, value]) => (
+                      <div key={key} className="flex">
+                        <span className="text-purple-300 w-12 flex-shrink-0">{key}:</span>
+                        <span className="text-white/90 truncate">
+                          {key === 'iat' || key === 'exp'
+                            ? formatTimestamp(value as number)
+                            : formatValue(value)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {/* Token Type & Expiry for access tokens */}
+              {decoded.signature_preview && (
+                <div className="bg-black/30 rounded p-2">
+                  <div className="text-[10px] font-semibold text-cyan-300 uppercase mb-1">Signature</div>
+                  <div className="font-mono text-[10px] text-cyan-200/80 truncate">
+                    {decoded.signature_preview}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
           {tokenInfo?.token_type && (
-            <div className="flex items-center space-x-3 text-[10px] text-white/60">
+            <div className="flex items-center space-x-3 text-[10px] text-white/60 mt-2">
               <span>Type: {tokenInfo.token_type}</span>
               {tokenInfo.expires_in && <span>Expires in: {tokenInfo.expires_in}s</span>}
             </div>

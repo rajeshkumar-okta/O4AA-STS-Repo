@@ -123,35 +123,6 @@ export default function AgentFlowCard({ steps, isLoading }: Props) {
           })}
         </div>
 
-        {/* Step Details */}
-        {steps.length > 0 && (
-          <div className="mt-4 pt-3 border-t border-gray-100">
-            <div className="space-y-1">
-              {steps.map((step, idx) => (
-                <div
-                  key={idx}
-                  className={`flex items-center justify-between text-xs px-2 py-1 rounded ${
-                    step.status === 'completed' ? 'bg-success-green/5' :
-                    step.status === 'error' ? 'bg-error-red/5' :
-                    step.status === 'processing' ? 'bg-accent/5' :
-                    'bg-gray-50'
-                  }`}
-                >
-                  <span className="text-gray-600 font-mono">{step.step}</span>
-                  <span className={`${
-                    step.status === 'completed' ? 'text-success-green' :
-                    step.status === 'error' ? 'text-error-red' :
-                    step.status === 'processing' ? 'text-accent' :
-                    'text-gray-400'
-                  }`}>
-                    {step.action}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Loading indicator */}
         {isLoading && (
           <div className="flex items-center justify-center gap-2 mt-3 pt-3 border-t border-gray-100">

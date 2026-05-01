@@ -9,7 +9,15 @@
       "Bash(git push:*)",
       "Bash(cd:*)",
       "Bash(sleep 1:*)",
-      "Bash(find /Users/rajeshkumar/Documents/AI/workspace/oktaforai/DevOpsAgentDemo -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.py\" -o -name \"*.json\" -o -name \"*.md\" \\\\\\) ! -path \"*/venv/*\" ! -path \"*/node_modules/*\" ! -path \"*/.next/*\" 2>/dev/null | sort)"
+      "Bash(find /Users/rajeshkumar/Documents/AI/workspace/oktaforai/DevOpsAgentDemo -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.py\" -o -name \"*.json\" -o -name \"*.md\" \\\\\\) ! -path \"*/venv/*\" ! -path \"*/node_modules/*\" ! -path \"*/.next/*\" 2>/dev/null | sort)",
+      "Bash(npx tsc *)",
+      "Bash(npx --no-install tsc --noEmit)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(git -C /Users/rajeshkumar/Documents/AI/workspace/oktaforai/DevOpsAgentDemo status)",
+      "Bash(git -C /Users/rajeshkumar/Documents/AI/workspace/oktaforai/DevOpsAgentDemo diff --stat)",
+      "Bash(git *)",
+      "Bash(./node_modules/.bin/next build *)",
+      "Bash(./node_modules/.bin/next dev *)"
     ]
   }
 }

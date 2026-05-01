@@ -275,8 +275,8 @@ export default function WorkflowSteps({ exchanges, isLoading, activeService = 'g
         <div className="px-4 pb-4 space-y-2 animate-fadeIn">
           <Step
             stepNumber={1}
-            title="User Authentication"
-            description="Okta issues ID Token on sign-in"
+            title="User authenticated to Okta for Chat Bot interface"
+            description="Sign-in complete; ID Token issued"
             icon={<User className="w-3 h-3 text-white" />}
             status={statusOf(hasIdToken, isLoading === true && !hasIdToken)}
           >
@@ -289,8 +289,8 @@ export default function WorkflowSteps({ exchanges, isLoading, activeService = 'g
 
           <Step
             stepNumber={2}
-            title="Agent Client Assertion"
-            description="Agent signs a JWT with its RS256 private key"
+            title="AI Agent proves its identity to Okta"
+            description="Signed JWT (RS256) sent to Okta STS"
             icon={<FileText className="w-3 h-3 text-white" />}
             status={statusOf(hasClientAssertion, isLoading === true && !hasClientAssertion)}
           >
@@ -303,7 +303,7 @@ export default function WorkflowSteps({ exchanges, isLoading, activeService = 'g
 
           <Step
             stepNumber={3}
-            title="Token Exchange Request"
+            title="Agent requests delegated access on user's behalf"
             description="POST /oauth2/v1/token (token-exchange grant)"
             icon={<Send className="w-3 h-3 text-white" />}
             status={statusOf(hasClientAssertion && hasIdToken, isLoading === true)}
@@ -325,8 +325,8 @@ export default function WorkflowSteps({ exchanges, isLoading, activeService = 'g
           {requiredConsent && (
             <Step
               stepNumber={4}
-              title="Consent / Interaction"
-              description={`User redirected to ${serviceName} to authorize`}
+              title={`User grants consent at ${serviceName}`}
+              description={`First-time authorization at ${serviceName}`}
               icon={<AlertCircle className="w-3 h-3 text-white" />}
               status={granted ? 'complete' : 'active'}
             >
@@ -340,8 +340,8 @@ export default function WorkflowSteps({ exchanges, isLoading, activeService = 'g
 
           <Step
             stepNumber={requiredConsent ? 5 : 4}
-            title="Access Token Issued"
-            description={`Okta returns ${serviceName} access token`}
+            title={`Okta issues scoped access for ${serviceName}`}
+            description="Scoped credentials granted to the agent"
             icon={<Key className="w-3 h-3 text-white" />}
             status={statusOf(hasAccessToken && granted, isLoading === true)}
           >
@@ -355,8 +355,8 @@ export default function WorkflowSteps({ exchanges, isLoading, activeService = 'g
 
           <Step
             stepNumber={requiredConsent ? 6 : 5}
-            title={`${serviceName} API Call`}
-            description="Agent calls API with Bearer token"
+            title={`AI Agent acts on user's behalf in ${serviceName}`}
+            description={`Performs the requested task in ${serviceName}`}
             icon={<Server className="w-3 h-3 text-white" />}
             status={statusOf(hasAccessToken && granted, isLoading === true && hasAccessToken)}
           >

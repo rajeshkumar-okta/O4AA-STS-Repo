@@ -10,6 +10,7 @@ import TokenExchangeCard from '@/components/TokenExchangeCard';
 import UserIdentityCard from '@/components/UserIdentityCard';
 import QuickActionsCard from '@/components/QuickActionsCard';
 import TokenFlowAnalysis from '@/components/TokenFlowAnalysis';
+import WorkflowSteps from '@/components/WorkflowSteps';
 import { ChatMessage, AgentFlowStep, TokenExchange } from '@/types';
 
 const githubExampleQuestions = [
@@ -880,6 +881,9 @@ export default function Home() {
 
           {/* Token Flow Analysis - Learn More Section */}
           <TokenFlowAnalysis exchanges={currentTokenExchanges} isLoading={isLoading} activeService={activeService} />
+
+          {/* Step-by-Step Workflow */}
+          <WorkflowSteps exchanges={currentTokenExchanges} isLoading={isLoading} activeService={activeService} />
 
           {/* Quick Actions */}
           <QuickActionsCard onAction={(msg) => handleSendMessage(msg)} onTestConsent={handleTestConsent} activeService={activeService} />

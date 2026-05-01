@@ -3,13 +3,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 import AgentFlowCard from '@/components/AgentFlowCard';
 import TokenExchangeCard from '@/components/TokenExchangeCard';
 import UserIdentityCard from '@/components/UserIdentityCard';
 import QuickActionsCard from '@/components/QuickActionsCard';
-import TokenFlowAnalysis from '@/components/TokenFlowAnalysis';
 import WorkflowSteps from '@/components/WorkflowSteps';
 import { ChatMessage, AgentFlowStep, TokenExchange } from '@/types';
 
@@ -879,30 +877,11 @@ export default function Home() {
           {/* Token Exchanges */}
           <TokenExchangeCard exchanges={currentTokenExchanges} />
 
-          {/* Token Flow Analysis - Learn More Section */}
-          <TokenFlowAnalysis exchanges={currentTokenExchanges} isLoading={isLoading} activeService={activeService} />
-
           {/* Step-by-Step Workflow */}
           <WorkflowSteps exchanges={currentTokenExchanges} isLoading={isLoading} activeService={activeService} />
 
           {/* Quick Actions */}
           <QuickActionsCard onAction={(msg) => handleSendMessage(msg)} onTestConsent={handleTestConsent} activeService={activeService} />
-
-          {/* Architecture Link */}
-          <Link
-            href={`/architecture?service=${activeService}`}
-            className="block p-4 bg-gradient-to-r from-okta-blue to-okta-blue-light text-white rounded-xl hover:shadow-lg transition hover:scale-[1.02]"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="font-semibold">Learn More</div>
-                <div className="text-sm text-white/80">View Architecture Details</div>
-              </div>
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </Link>
         </div>
       </div>
     </main>

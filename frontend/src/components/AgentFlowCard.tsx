@@ -56,13 +56,13 @@ export default function AgentFlowCard({ steps, isLoading }: Props) {
   return (
     <div className="rounded-xl border-2 shadow-sm overflow-hidden" style={{ backgroundColor: '#e0f2f1', borderColor: '#26a69a' }}>
       <div className="bg-gradient-to-r from-primary to-primary-light px-4 py-3 border-b border-neutral-border">
-        <h3 className="text-white font-semibold flex items-center gap-2">
+        <h3 className="text-black font-semibold flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
           <span>Agent Flow</span>
-          <span className="text-white/60 text-sm font-normal">— LangGraph + Claude</span>
+          <span className="text-black/60 text-sm font-normal">— LangGraph + Claude</span>
         </h3>
       </div>
 
